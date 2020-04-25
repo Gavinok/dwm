@@ -6,8 +6,8 @@ static const unsigned int gappx     = 15;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "Liberation Mono:pixelsize=13:antialias=true:autohint=true" , "FontAwesome:size=7" };
-static const char dmenufont[]       = "Liberation Mono:pixelsize=13:antialias=true:autohint=true";
+static const char *fonts[]          = { "Liberation Mono:pixelsize=13:antialias=true:autohint=true" , "Font Awesome 5 Free:size=9" };
+static const char dmenufont[]       = "monospace-10";
 static char normbgcolor[]           = "#222222";
 static char normbordercolor[]       = "#444444";
 static char normfgcolor[]           = "#bbbbbb";
@@ -43,8 +43,8 @@ static const int resizehints = 1;    /* 1 means respect size hints in tiled resi
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[]=",      tile },    /* first entry is default */
-	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
+	{ "><>",      NULL },    /* no layout function means floating behavior */
 };
 
 static const unsigned int deltamv   = 20; /* deltamvmv = the amount of pixels each movement will be by */
@@ -64,7 +64,7 @@ static const unsigned int deltamv   = 20; /* deltamvmv = the amount of pixels ea
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-p", ">>", NULL };
 static const char *termcmd[]  = { "st", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
@@ -78,9 +78,9 @@ static const char *calc[]          =  { "roficalc.sh", NULL };
 static const char term[]           =  { "st"};
 static const char exec[]           =  { "-e" };
 static const char *email[]         =  { term, "-t", "neomutt", exec, "launch_once.sh", "neomutt", NULL };
-static const char *mixer[]         =  { term, exec, "launch_once.sh", "pulsemixer", NULL };
 static const char *rss[]           =  { term, exec, "newspod", NULL };
 static const char *sysmonitor[]    =  { term, exec, "htop", NULL };
+static const char *mixer[]         =  { term, exec, "mc", NULL };
 static const char *mute[]          =  { "mc", "mute", NULL };
 static const char *vdown[]         =  { "mc", "down", "5", NULL };
 static const char *vup[]           =  { "mc", "up", "5", NULL };
@@ -129,8 +129,8 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
 	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
-	/* { MODKEY,                       XK_minus,  setgaps,        {.i = -5 } }, */
-	/* { MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = +5 } }, */
+	{ MODKEY,                       XK_minus,  setgaps,        {.i = -5 } },
+	{ MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = +5 } },
 
 	{ 0,                            0x1008ff11, spawn,         {.v = vdown } },
 	{ 0,                            0x1008ff13, spawn,         {.v = vup } },
@@ -169,7 +169,7 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
 	{ MODKEY,                       XK_u, scratchpad_show,     {0} },
 	{ MODKEY|ShiftMask,             XK_u, scratchpad_hide,     {0} },
-	/* { MODKEY|ControlMask,           XK_u, scratchpad_remove,   {0} }, */
+	{ MODKEY|ControlMask,           XK_u, scratchpad_remove,   {0} },
 };
 
 /* button definitions */
