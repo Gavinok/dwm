@@ -112,6 +112,7 @@ struct Client {
 	Client *next;
 	Client *snext;
 	Monitor *mon;
+	char scratchkey;
 	Window win;
 };
 
@@ -156,6 +157,7 @@ typedef struct {
 	unsigned int tags;
 	int isfloating;
 	int monitor;
+	const char scratchkey;
 } Rule;
 
 /* function declarations */
@@ -212,12 +214,6 @@ static void resizemouse(const Arg *arg);
 static void restack(Monitor *m);
 static void run(void);
 static void scan(void);
-static void scratchpad_hide ();
-static _Bool scratchpad_last_showed_is_killed (void);
-static void scratchpad_remove ();
-static void scratchpad_show ();
-static void scratchpad_show_client (Client * c);
-static void scratchpad_show_first (void);
 static int sendevent(Client *c, Atom proto);
 static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
@@ -231,11 +227,13 @@ static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
 static void sigchld(int unused);
 static void spawn(const Arg *arg);
+static void spawnscratch(const Arg *arg);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
+static void togglescratch(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
@@ -294,7 +292,6 @@ static Display *dpy;
 static Drw *drw;
 static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
-static Client * scratchpad_last_showed = NULL;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -315,6 +312,7 @@ applyrules(Client *c)
 	/* rule matching */
 	c->isfloating = 0;
 	c->tags = 0;
+	c->scratchkey = 0;
 	XGetClassHint(dpy, c->win, &ch);
 	class    = ch.res_class ? ch.res_class : broken;
 	instance = ch.res_name  ? ch.res_name  : broken;
@@ -327,6 +325,7 @@ applyrules(Client *c)
 		{
 			c->isfloating = r->isfloating;
 			c->tags |= r->tags;
+			c->scratchkey = r->scratchkey;
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
 				c->mon = m;
@@ -1470,98 +1469,6 @@ scan(void)
 	}
 }
 
-
-static void scratchpad_hide ()
-{
-	if (selmon -> sel)
-	{
-		selmon -> sel -> tags = scratchpad_mask;
-		focus(NULL);
-		arrange(selmon);
-	}
-}
-
-static _Bool scratchpad_last_showed_is_killed (void)
-{
-	_Bool killed = 1;
-	for (Client * c = selmon -> clients; c != NULL; c = c -> next)
-	{
-		if (c == scratchpad_last_showed)
-		{
-			killed = 0;
-			break;
-		}
-	}
-	return killed;
-}
-
-static void scratchpad_remove ()
-{
-	if (selmon -> sel && scratchpad_last_showed != NULL && selmon -> sel == scratchpad_last_showed)
-		scratchpad_last_showed = NULL;
-}
-
-static void scratchpad_show ()
-{
-	if (scratchpad_last_showed == NULL || scratchpad_last_showed_is_killed ())
-		scratchpad_show_first ();
-	else
-	{
-		if (scratchpad_last_showed -> tags != scratchpad_mask)
-		{
-			scratchpad_last_showed -> tags = scratchpad_mask;
-			focus(NULL);
-			arrange(selmon);
-		}
-		else
-		{
-			_Bool found_current = 0;
-			_Bool found_next = 0;
-			for (Client * c = selmon -> clients; c != NULL; c = c -> next)
-			{
-				if (found_current == 0)
-				{
-					if (c == scratchpad_last_showed)
-					{
-						found_current = 1;
-						continue;
-					}
-				}
-				else
-				{
-					if (c -> tags == scratchpad_mask)
-					{
-						found_next = 1;
-						scratchpad_show_client (c);
-						break;
-					}
-				}
-			}
-			if (found_next == 0) scratchpad_show_first ();
-		}
-	}
-}
-
-static void scratchpad_show_client (Client * c)
-{
-	scratchpad_last_showed = c;
-	c -> tags = selmon->tagset[selmon->seltags];
-	focus(c);
-	arrange(selmon);
-}
-
-static void scratchpad_show_first (void)
-{
-	for (Client * c = selmon -> clients; c != NULL; c = c -> next)
-	{
-		if (c -> tags == scratchpad_mask)
-		{
-			scratchpad_show_client (c);
-			break;
-		}
-	}
-}
-
 void
 sendmon(Client *c, Monitor *m)
 {
@@ -1817,6 +1724,19 @@ spawn(const Arg *arg)
 	}
 }
 
+void spawnscratch(const Arg *arg)
+{
+	if (fork() == 0) {
+		if (dpy)
+			close(ConnectionNumber(dpy));
+		setsid();
+		execvp(((char **)arg->v)[1], ((char **)arg->v)+1);
+		fprintf(stderr, "dwm: execvp %s", ((char **)arg->v)[1]);
+		perror(" failed");
+		exit(EXIT_SUCCESS);
+	}
+}
+
 void
 tag(const Arg *arg)
 {
@@ -1883,6 +1803,29 @@ togglefloating(const Arg *arg)
 			selmon->sel->w, selmon->sel->h, 0);
 	arrange(selmon);
 }
+
+void
+togglescratch(const Arg *arg)
+{
+	Client *c;
+	unsigned int found = 0;
+
+	for (c = selmon->clients; c && !(found = c->scratchkey == ((char**)arg->v)[0][0]); c = c->next);
+	if (found) {
+		c->tags = ISVISIBLE(c) ? 0 : selmon->tagset[selmon->seltags];
+		focus(NULL);
+		arrange(selmon);
+
+		if (ISVISIBLE(c)) {
+			focus(c);
+			restack(selmon);
+		}
+
+	} else{
+		spawnscratch(arg);
+	}
+}
+
 
 void
 toggletag(const Arg *arg)
