@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 3;        /* border pixel of windows */
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int gappx     = 15;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
@@ -31,6 +31,7 @@ static const Rule rules[] = {
 	/* class      instance    title       tags mask     isfloating   monitor    scratch key */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1,        0  },
 	{ "firefox",  NULL,       NULL,       1 << 8,       0,           -1,        0  },
+	{ "zoom",     NULL,      "Polls",     0,            1,           -1,        0  },
 	{ NULL,       NULL,   "scratchpad",   0,            1,           -1,       's' },
 	{ NULL,       NULL,   "calculator",   0,            1,           -1,       'c' },
 };
@@ -62,41 +63,41 @@ static const unsigned int deltamv   = 20; /* deltamvmv = the amount of pixels ea
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
-/* commands */
-static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-p", ">>", NULL };
-static const char *termcmd[]  = { "st", NULL };
 /* static const char scratchpadname[] = "scratchpad"; */
 /* static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL }; */
 
-/*First arg only serves to match against key in rules*/
-static const char *scratchpadcmd[] = {"s", "st", "-t", "scratchpad", NULL}; 
-static const char *calc[] = {"c", "st", "-t", "calculator", "-e", "R", NULL}; 
+/* commands */
+static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-p", ">>", NULL };
+static const char *termcmd[]  = { "/bin/sh", "-c", "${TERMINAL}", NULL };
 
-static const char *barmenu[]	   = { "bar", NULL };
 
-static const char *shot[]          =  {  "windowshot.sh",  "-c",  NULL  };
-static const char *dmenushot[]     =  {  "windowshot.sh",  NULL   };    
-static const char *nm[]            =  { "dmenu_connection_manager.sh", NULL };
+static const char *barmenu[]       =  {"bar",            NULL   };
 
-/* static const char *calc[]          =  { "calc.sh", NULL }; */
+static const char *shot[]          =  {"windowshot.sh",  "-c",  NULL          };
+static const char *dmenushot[]     =  {"windowshot.sh",  NULL    };             
+static const char *nm[]            =  {"dmenu_connection_manager.sh", NULL };
+
 static const char term[]           =  { "st"};
 static const char exec[]           =  { "-e" };
+/*First arg only serves to match against key in rules*/
+static const char *scratchpadcmd[] =  {"s", term,             "-t",  "scratchpad", NULL}; 
+static const char *calc[]          =  {"c", term,             "-t",  "calculator", "-e",  "R", NULL}; 
 static const char *email[]         =  { term, "-t", "neomutt", exec, "launch_once.sh", "neomutt", NULL };
-static const char *mixer[]         =  { term, exec, "mc", NULL };
-static const char *mute[]          =  { "mc", "mute", NULL };
-static const char *vdown[]         =  { "mc", "down", "5", NULL };
-static const char *vup[]           =  { "mc", "up", "5", NULL };
-static const char *ldown[]         =  { "lc", "down", "7", NULL };
-static const char *lup[]           =  { "lc", "up", "7", NULL };
+static const char *mixer[]         =  { term, exec, "cm", NULL };
+static const char *mute[]          =  { "cm", "mute", NULL };
+static const char *vdown[]         =  { "cm", "down", "5", NULL };
+static const char *vup[]           =  { "cm", "up", "5", NULL };
+static const char *ldown[]         =  { "cl", "down", "7", NULL };
+static const char *lup[]           =  { "cl", "up", "7", NULL };
 static const char *search[]        =  { "ducksearch", NULL };
 static const char *browser[]       =  { "/bin/sh", "-c", "ducksearch \"google-chrome-stable \"" , NULL };
+static const char *plumb[]         =  { "/bin/sh", "-c", "${PLUMBER} -c", NULL };
 static const char *clip[]          =  { "clipmenu", NULL };
-static const char *plumb[]         =  { "cabl", "-c", NULL };
 static const char *killit[]        =  { "dmenu-killall", NULL };
 static const char *power[]         =  { "power_menu.sh", NULL };
 static const char *tutoral[]       =  { "tutorialvids", NULL };
-static const char *rotate[]       =  { "rotate_screen", NULL };
+static const char *rotate[]        =  { "rotate_screen", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
