@@ -6,6 +6,8 @@ static const unsigned int gappx     = 15;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
+static const int vertpad            = 10;       /* vertical padding of bar */
+static const int sidepad            = 10;       /* horizontal padding of bar */
 static const char *fonts[]          = { "Liberation Mono:pixelsize=13:antialias=true:autohint=true" , "Font Awesome 5 Free:size=9" };
 static const char dmenufont[]       = "monospace-10";
 static char normbgcolor[]           = "#222222";
@@ -68,6 +70,9 @@ static const unsigned int deltamv   = 20; /* deltamvmv = the amount of pixels ea
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
+
+/* TODO: force dmenu to the right monitor   <05-06-20 Gavin Jaeger-Freeborn>*/
+/* TODO: add appropriate gaps to dmenu <05-06-20 Gavin Jaeger-Freeborn>*/
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-p", ">>", NULL };
 static const char *termcmd[]  = { "/bin/sh", "-c", "${TERMINAL}", NULL };
 
