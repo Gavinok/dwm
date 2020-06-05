@@ -1168,6 +1168,11 @@ monocle(Monitor *m)
 {
 	unsigned int n = 0;
 	Client *c;
+	if (sp != 0) {
+		sp = 0;
+		vp = 0;
+		XMoveResizeWindow(dpy, selmon->barwin, selmon->wx + sp, selmon->by + vp, selmon->ww - 2 * sp, bh);
+	}
 
 	for (c = m->clients; c; c = c->next)
 		if (ISVISIBLE(c))
@@ -1766,6 +1771,13 @@ tile(Monitor *m)
 {
 	unsigned int i, n, h, mw, my, ty;
 	Client *c;
+
+	/* TODO: set per monitor <04-06-20 Gavin Jaeger-Freeborn>*/
+	if (sp != sidepad) {
+		sp = sidepad;
+		vp = vertpad;
+		XMoveResizeWindow(dpy, selmon->barwin, selmon->wx + sp, selmon->by + vp, selmon->ww - 2 * sp, bh);
+	}
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
 	if (n == 0)
