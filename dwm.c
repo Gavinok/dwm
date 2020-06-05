@@ -1783,7 +1783,7 @@ tile(Monitor *m)
 
 	if (sp != sidepad) {
 		sp = sidepad;
-		vp = vertpad;
+		vp = (topbar == 1) ? vertpad : - vertpad;
 		updatebarspace(m);
 	}
 
