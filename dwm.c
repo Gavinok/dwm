@@ -241,6 +241,7 @@ static void unmanage(Client *c, int destroyed);
 static void unmapnotify(XEvent *e);
 static void updatebarpos(Monitor *m);
 static void updatebars(void);
+static void updatebarspace(Monitor *m);
 static void updateclientlist(void);
 static int updategeom(void);
 static void updatenumlockmask(void);
@@ -1164,6 +1165,14 @@ maprequest(XEvent *e)
 }
 
 void
+updatebarspace(Monitor *m)
+{
+	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx + sp, selmon->by + vp, selmon->ww - 2 * sp, bh);
+	updatebars();
+	updatebarpos(m);
+}
+
+void
 monocle(Monitor *m)
 {
 	unsigned int n = 0;
@@ -1171,7 +1180,7 @@ monocle(Monitor *m)
 	if (sp != 0) {
 		sp = 0;
 		vp = 0;
-		XMoveResizeWindow(dpy, selmon->barwin, selmon->wx + sp, selmon->by + vp, selmon->ww - 2 * sp, bh);
+		updatebarspace(m);
 	}
 
 	for (c = m->clients; c; c = c->next)
@@ -1772,11 +1781,10 @@ tile(Monitor *m)
 	unsigned int i, n, h, mw, my, ty;
 	Client *c;
 
-	/* TODO: set per monitor <04-06-20 Gavin Jaeger-Freeborn>*/
 	if (sp != sidepad) {
 		sp = sidepad;
 		vp = vertpad;
-		XMoveResizeWindow(dpy, selmon->barwin, selmon->wx + sp, selmon->by + vp, selmon->ww - 2 * sp, bh);
+		updatebarspace(m);
 	}
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
