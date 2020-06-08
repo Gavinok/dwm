@@ -1170,6 +1170,7 @@ updatebarspace(Monitor *m)
 {
 	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx + sp, selmon->by + vp, selmon->ww - 2 * sp, bh);
 	updatebars();
+	updatestatus();
 	updatebarpos(m);
 }
 
