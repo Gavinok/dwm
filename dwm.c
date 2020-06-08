@@ -1964,8 +1964,10 @@ updatebarpos(Monitor *m)
 		m->wh = m->wh - abs(vp) - bh;
 		m->by = m->topbar ? m->wy : m->wy + m->wh + abs(vp);
 		m->wy = m->topbar ? m->wy + bh + vp : m->wy;
-	} else
-		m->by = -bh - vp;
+	} else if (topbar == 1)
+		m->by = -bh - vertpad;
+	else
+		m->by = -bh + vertpad;
 }
 
 void
