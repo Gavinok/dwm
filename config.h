@@ -71,7 +71,6 @@ static const unsigned int deltamv   = 20; /* deltamvmv = the amount of pixels ea
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 
-/* TODO: force dmenu to the right monitor   <05-06-20 Gavin Jaeger-Freeborn>*/
 /* TODO: add appropriate gaps to dmenu <05-06-20 Gavin Jaeger-Freeborn>*/
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-p", ">>", NULL };
 static const char *termcmd[]  = { "/bin/sh", "-c", "${TERMINAL}", NULL };
