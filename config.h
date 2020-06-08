@@ -198,5 +198,7 @@ static Button buttons[] = {
 	{ ClkStatusText,        0,              Button1,        spawn,          {.v = barmenu } },
 	{ ClkRootWin, 		    0,              Button1,      	spawn,          {.v = barmenu } },
 	{ ClkClientWin, 		ShiftMask,      Button3,      	spawn,          {.v = plumb } },
+	{ ClkStatusText,        0,              Button4,        spawn,          {.v = vup } },
+	{ ClkStatusText,        0,              Button5,        spawn,          {.v = vdown } },
 };
 
