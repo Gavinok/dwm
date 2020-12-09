@@ -2,7 +2,7 @@
 
 /* appearance */
 static const unsigned int borderpx  = 0;        /* border pixel of windows */
-static const unsigned int gappx     = 10;        /* gaps between windows */
+static const unsigned int gappx     = 17;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
@@ -43,6 +43,7 @@ static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] 
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 
+#include "maximize.c"
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[]=",      tile },    /* first entry is default */
@@ -86,9 +87,10 @@ static const char term[]           =  { "st"};
 static const char exec[]           =  { "-e" };
 /*First arg only serves to match against key in rules*/
 static const char *scratchpadcmd[] =  {"s", term,             "-t",  "scratchpad", NULL}; 
-static const char *calc[]          =  {"c", term,             "-t",  "calculator", "-e",  "R", NULL}; 
+static const char *scratchpadalt[] =  {"S", term,             "-t",  "scratchpadalt", NULL}; 
+static const char *calc[]          =  {"c", term, "-f", "Liberation Mono:pixelsize=18:antialias=true:autohint=true", "-t", "calculator", "-e", "qalc", NULL}; 
 static const char *email[]         =  { term, "-t", "neomutt", exec, "launch_once.sh", "neomutt", NULL };
-static const char *rss[]           =  { "feeder", NULL };
+static const char *rec[]           =  { "dmenurecord", NULL };
 static const char *mixer[]         =  { term, exec, "cm", NULL };
 static const char *mute[]          =  { "cm", "mute", NULL };
 static const char *vdown[]         =  { "cm", "down", "5", NULL };
@@ -103,12 +105,18 @@ static const char *killit[]        =  { "dmenu-killall", NULL };
 static const char *power[]         =  { "power_menu.sh", NULL };
 static const char *tutoral[]       =  { "tutorialvids", NULL };
 static const char *rotate[]        =  { "rotate_screen", NULL };
+static const char *keyboard[]      =  { "svkbd-en", "-g", "1280x250+0+0", NULL };
+static const char *record[]        =  { "dmenurecord", NULL };
+static const char *noteclose[]     =  { "dunstctl", "close-all", NULL };
+static const char *noteopen[]      =  { "dunstctl", "history-pop", NULL };
+static const char *spell[]         =  { "typo", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_d,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,             			XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_u,      togglescratch,  {.v = scratchpadcmd } },
+	{ MODKEY|ShiftMask,             XK_u,      togglescratch,  {.v = scratchpadalt } },
 	{ MODKEY,                    	XK_c,      togglescratch,  {.v = calc } },
 	/* { MODKEY,                       XK_u,  	   togglescratch,  {.v = scratchpadcmd } }, */
 	/* { MODKEY|ShiftMask,             XK_u, 	   spawn,  		   {.v = scratchpadcmd } }, */
@@ -131,7 +139,7 @@ static Key keys[] = {
 	{ MODKEY,             	XK_BackSpace, 	   killclient,     {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_f,  	   setlayout,      {0} },
+	{ MODKEY,                       XK_f,      max,            {.i = 0} },
 	{ MODKEY|ShiftMask,             XK_z,  	   togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
@@ -143,10 +151,13 @@ static Key keys[] = {
 	{ MODKEY,                       XK_minus,  setgaps,        {.i = -5 } },
 	{ MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = +5 } },
 
+	{ MODKEY,                       XK_grave,  spawn,          {.v = noteclose} },
+	{ MODKEY|ShiftMask,             XK_grave,  spawn,          {.v = noteopen} },
 	{ 0,                            0x1008ff11, spawn,         {.v = vdown } },
 	{ 0,                            0x1008ff13, spawn,         {.v = vup } },
 	{ 0,                            0x1008ff12, spawn,         {.v = mute } },
 	{ 0,                            0x1008ff7f, spawn,         {.v = rotate } },
+	{ 0,                            0x1008ff2d, spawn,         {.v = keyboard } },
 	{ MODKEY,                       XK_equal,  spawn,          {.v = nm }   },
 	{ 0,                            XK_Print,  spawn,          {.v = shot } },
 	{ MODKEY,                       XK_Print,  spawn,          {.v = dmenushot } },
@@ -155,7 +166,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_y,      spawn,          {.v = mixer } },
 	{ MODKEY|ShiftMask,             XK_t,      spawn,          {.v = tutoral } },
 	{ MODKEY,                       XK_e,      spawn,          {.v = email } },
-	{ MODKEY,                       XK_r,      spawn,          {.v = rss } },
+	{ MODKEY,                       XK_r,      spawn,          {.v = rec } },
 	{ MODKEY,                       XK_w,      spawn,          {.v = search } },
 	{ MODKEY|ShiftMask,             XK_w,      spawn,          {.v = browser } },
 	{ MODKEY|ControlMask,           XK_q,      spawn,          {.v = killit } },
@@ -166,7 +177,9 @@ static Key keys[] = {
 	{ MODKEY|ControlMask,           XK_f,      spawn,          {.v = vup } },
 	{ MODKEY|ControlMask,           XK_d,      spawn,          {.v =  lup } },
 	{ MODKEY|ControlMask,           XK_s,      spawn,          {.v = ldown } },
+	{ MODKEY|ShiftMask,             XK_s,      spawn,          {.v = spell } },
 	{ MODKEY|ControlMask,           XK_a,      spawn,          {.v = vdown } },
+	{ MODKEY,               XK_backslash,      spawn,          {.v = record} },
 
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
@@ -200,6 +213,6 @@ static Button buttons[] = {
 	{ ClkRootWin, 		    0,              Button1,      	spawn,          {.v = barmenu } },
 	{ ClkClientWin, 		ShiftMask,      Button3,      	spawn,          {.v = plumb } },
 	{ ClkStatusText,        0,              Button4,        spawn,          {.v = vup } },
-	{ ClkStatusText,        0,              Button5,        spawn,          {.v = vdown } },
+	{ 0,        0,              8,        focusmv,        {.i = +1 }},
 };
 
