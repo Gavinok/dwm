@@ -175,7 +175,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          {.v = clip } },
 
 	{ MODKEY|ControlMask,           XK_f,      spawn,          {.v = vup } },
-	{ MODKEY|ControlMask,           XK_d,      spawn,          {.v =  lup } },
+	{ MODKEY|ControlMask,           XK_d,      spawn,          {.v = lup } },
 	{ MODKEY|ControlMask,           XK_s,      spawn,          {.v = ldown } },
 	{ MODKEY|ShiftMask,             XK_s,      spawn,          {.v = spell } },
 	{ MODKEY|ControlMask,           XK_a,      spawn,          {.v = vdown } },
