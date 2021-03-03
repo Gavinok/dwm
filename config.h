@@ -109,38 +109,39 @@ static const char *keyboard[]      =  { "svkbd-en", "-g", "1280x250+0+0", NULL }
 static const char *record[]        =  { "dmenurecord", NULL };
 static const char *noteclose[]     =  { "dunstctl", "close-all", NULL };
 static const char *noteopen[]      =  { "dunstctl", "history-pop", NULL };
+static const char *wac[]           =  { "wac",  NULL };
 static const char *spell[]         =  { "typo", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_d,      spawn,          {.v = dmenucmd } },
-	{ MODKEY,             			XK_Return, spawn,          {.v = termcmd } },
+	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_u,      togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY|ShiftMask,             XK_u,      togglescratch,  {.v = scratchpadalt } },
-	{ MODKEY,                    	XK_c,      togglescratch,  {.v = calc } },
-	/* { MODKEY,                       XK_u,  	   togglescratch,  {.v = scratchpadcmd } }, */
-	/* { MODKEY|ShiftMask,             XK_u, 	   spawn,  		   {.v = scratchpadcmd } }, */
+	{ MODKEY,                       XK_c,      togglescratch,  {.v = calc } },
+	/* { MODKEY,                       XK_u,       togglescratch,  {.v = scratchpadcmd } }, */
+	/* { MODKEY|ShiftMask,             XK_u,       spawn,          {.v = scratchpadcmd } }, */
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_j,      mv,       	   {.i = -2} },
+	{ MODKEY|ShiftMask,             XK_j,      mv,             {.i = -2} },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_k,      mv,       	   {.i = +2} },
+	{ MODKEY|ShiftMask,             XK_k,      mv,             {.i = +2} },
 	{ MODKEY,                       XK_a,      incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_s,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_h,      focusmv,        {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_h,      mv,       	   {.i = 1} },
-	{ MODKEY,             XK_bracketright, 	   setmfact,       {.f = +0.05} },
+	{ MODKEY|ShiftMask,             XK_h,      mv,             {.i = 1} },
+	{ MODKEY,             XK_bracketright,     setmfact,       {.f = +0.05} },
 	{ MODKEY,             XK_bracketleft,      setmfact,       {.f = -0.05} },
 	{ MODKEY,                       XK_l,      focusmv,        {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_l,      mv,       	   {.i = -1} },
-	{ MODKEY,                       XK_v,	   zoom,           {0} },
+	{ MODKEY|ShiftMask,             XK_l,      mv,             {.i = -1} },
+	{ MODKEY,                       XK_v,      zoom,           {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
-	{ MODKEY,             			XK_q,      killclient,     {0} },
-	{ MODKEY,             	XK_BackSpace, 	   killclient,     {0} },
+	{ MODKEY,                       XK_q,      killclient,     {0} },
+	{ MODKEY,               XK_BackSpace,      killclient,     {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_f,      max,            {.i = 0} },
-	{ MODKEY|ShiftMask,             XK_z,  	   togglefloating, {0} },
+	{ MODKEY|ShiftMask,             XK_z,      togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
@@ -148,11 +149,13 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
 	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
+	{ MODKEY,                       XK_z,      spawn,          {.v = wac } },
 	{ MODKEY,                       XK_minus,  setgaps,        {.i = -5 } },
 	{ MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = +5 } },
 
 	{ MODKEY,                       XK_grave,  spawn,          {.v = noteclose} },
 	{ MODKEY|ShiftMask,             XK_grave,  spawn,          {.v = noteopen} },
+	{ MODKEY,                       XK_Escape, spawn,          {.v = wac } },
 	{ 0,                            0x1008ff11, spawn,         {.v = vdown } },
 	{ 0,                            0x1008ff13, spawn,         {.v = vup } },
 	{ 0,                            0x1008ff12, spawn,         {.v = mute } },
@@ -161,7 +164,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_equal,  spawn,          {.v = nm }   },
 	{ 0,                            XK_Print,  spawn,          {.v = shot } },
 	{ MODKEY,                       XK_Print,  spawn,          {.v = dmenushot } },
-	{ 0,             				XK_Menu,   spawn,          {.v = (const char*[]){ "exit 0",  NULL }} },
+	{ 0,                            XK_Menu,   spawn,          {.v = (const char*[]){ "exit 0",  NULL }} },
 
 	{ MODKEY,                       XK_y,      spawn,          {.v = mixer } },
 	{ MODKEY|ShiftMask,             XK_t,      spawn,          {.v = tutoral } },
@@ -210,9 +213,9 @@ static Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 	{ ClkStatusText,        0,              Button1,        spawn,          {.v = barmenu } },
-	{ ClkRootWin, 		    0,              Button1,      	spawn,          {.v = barmenu } },
-	{ ClkClientWin, 		ShiftMask,      Button3,      	spawn,          {.v = plumb } },
+	{ ClkRootWin,           0,              Button1,        spawn,          {.v = barmenu } },
+	{ ClkClientWin,         ShiftMask,      Button3,        spawn,          {.v = plumb } },
 	{ ClkStatusText,        0,              Button4,        spawn,          {.v = vup } },
-	{ 0,        0,              8,        focusmv,        {.i = +1 }},
+	{ 0,                    0,              8,              focusmv,        {.i = +1 }},
 };
 
