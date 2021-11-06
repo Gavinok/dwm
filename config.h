@@ -1,4 +1,5 @@
-/* See LICENSE file for copyright and license details. */
+// -*- compile-command: "sudo make clean install" -*-
+//* See LICENSE file for copyright and license details. */
 
 /* appearance */
 static const unsigned int borderpx  = 0;        /* border pixel of windows */
@@ -88,10 +89,11 @@ static const char exec[]           =  { "-e" };
 /*First arg only serves to match against key in rules*/
 static const char *scratchpadcmd[] =  {"s", term,             "-t",  "scratchpad", NULL}; 
 static const char *scratchpadalt[] =  {"S", term,             "-t",  "scratchpadalt", NULL}; 
-static const char *calc[]          =  {"c", term, "-f", "Liberation Mono:pixelsize=18:antialias=true:autohint=true", "-t", "calculator", "-e", "qalc", NULL}; 
-static const char *email[]         =  { term, "-t", "neomutt", exec, "launch_once.sh", "neomutt", NULL };
+static const char *calc[]          =  {"c", term, "-f", "Liberation Mono:pixelsize=25:antialias=true:autohint=true", "-t", "calculator", "-e", "qalc", NULL}; 
+static const char *mixer[]          =  {"u", term, exec, "cm", NULL}; 
+static const char *email[]         =  { "e", term, "-t", "neomutt", exec, "neomutt", NULL };
 static const char *rec[]           =  { "dmenurecord", NULL };
-static const char *mixer[]         =  { term, exec, "cm", NULL };
+/* static const char *mixer[]         =  { term, exec, "cm", NULL }; */
 static const char *mute[]          =  { "cm", "mute", NULL };
 static const char *vdown[]         =  { "cm", "down", "5", NULL };
 static const char *vup[]           =  { "cm", "up", "5", NULL };
@@ -162,13 +164,13 @@ static Key keys[] = {
 	{ 0,                            0x1008ff7f, spawn,         {.v = rotate } },
 	{ 0,                            0x1008ff2d, spawn,         {.v = keyboard } },
 	{ MODKEY,                       XK_equal,  spawn,          {.v = nm }   },
-	{ 0,                            XK_Print,  spawn,          {.v = shot } },
+	/* { 0,                            XK_Print,  spawn,          {.v = shot } }, */
 	{ MODKEY,                       XK_Print,  spawn,          {.v = dmenushot } },
 	{ 0,                            XK_Menu,   spawn,          {.v = (const char*[]){ "exit 0",  NULL }} },
 
-	{ MODKEY,                       XK_y,      spawn,          {.v = mixer } },
 	{ MODKEY|ShiftMask,             XK_t,      spawn,          {.v = tutoral } },
-	{ MODKEY,                       XK_e,      spawn,          {.v = email } },
+	{ MODKEY,                       XK_y,      togglescratch,  {.v = mixer } },
+	{ MODKEY,                       XK_e,      togglescratch,  {.v = email } },
 	{ MODKEY,                       XK_r,      spawn,          {.v = rec } },
 	{ MODKEY,                       XK_w,      spawn,          {.v = search } },
 	{ MODKEY|ShiftMask,             XK_w,      spawn,          {.v = browser } },
@@ -214,7 +216,7 @@ static Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 	{ ClkStatusText,        0,              Button1,        spawn,          {.v = barmenu } },
 	{ ClkRootWin,           0,              Button1,        spawn,          {.v = barmenu } },
-	{ ClkClientWin,         ShiftMask,      Button3,        spawn,          {.v = plumb } },
+	{ ClkClientWin,      MODKEY|ShiftMask,  Button3,        spawn,          {.v = plumb } },
 	{ ClkStatusText,        0,              Button4,        spawn,          {.v = vup } },
 	{ 0,                    0,              8,              focusmv,        {.i = +1 }},
 };
