@@ -7,9 +7,12 @@ static const unsigned int gappx     = 17;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const int vertpad            = 0;       /* vertical padding of bar */
-static const int sidepad            = 0;       /* horizontal padding of bar */
-static const char *fonts[]          = { "Liberation Mono:pixelsize=14:antialias=true:autohint=true" , "Font Awesome 5 Free:size=9" };
+static const int vertpad            = 5;       /* vertical padding of bar */
+static const int sidepad            = 17;       /* horizontal padding of bar */
+static const char *fonts[]          = {
+	"PragmataPro Mono Liga:pixelsize=14:antialias=true:autohint=true",
+	"Font Awesome 5 Free:size=9"
+};
 static const char dmenufont[]       = "monospace-10";
 static char normbgcolor[]           = "#222222";
 static char normbordercolor[]       = "#444444";
@@ -31,12 +34,19 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class      instance    title       tags mask     isfloating   monitor    scratch key */
-	{ "Gimp",     NULL,       NULL,       0,            1,           -1,        0  },
-	{ "firefox",  NULL,       NULL,       1 << 8,       0,           -1,        0  },
-	{ "zoom",     NULL,      "Polls",     0,            1,           -1,        0  },
-	{ NULL,       NULL,   "scratchpad",   0,            1,           -1,       's' },
-	{ NULL,       NULL,   "calculator",   0,            1,           -1,       'c' },
+	/* class                    instance    title       tags mask     isfloating   monitor    scratch key */
+	{ "Gimp",                    NULL,      NULL,           0,            1,           -1,        0  },
+	{ "firefox",                 NULL,      NULL,           1 << 8,       0,           -1,        0  },
+	{ "davmail-DavGateway",      NULL,      NULL,           1 << 8,       1,           -1,        0  },
+	{ "zoom",                    NULL,      "Polls",        0,            1,           -1,        0  },
+	{ NULL,                      NULL,      "scratchpad",   0,            1,           -1,       's' },
+	{ NULL,                      NULL,      "scratchpad",   0,            1,           -1,       's' },
+	{ NULL,                      NULL,      "scratchpadalt",0,            1,           -1,       's' },
+	{ NULL,                      NULL,      "email",        0,            1,           -1,       'e' },
+	{ NULL,                      NULL,      "emacscratch",  0,            1,           -1,       'e' },
+	{ NULL,                      NULL,      "mixer",        0,            1,           -1,       'y' },
+	{ NULL,                      NULL,      "calculator",   0,            1,           -1,       'c' },
+	{ NULL,                      NULL,      "gtd",          0,            1,           -1,       'g' },
 };
 
 /* layout(s) */
@@ -75,23 +85,33 @@ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() 
 
 /* TODO: add appropriate gaps to dmenu <05-06-20 Gavin Jaeger-Freeborn>*/
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-p", ">>", NULL };
-static const char *termcmd[]  = { "/bin/sh", "-c", "${TERMINAL}", NULL };
+static const char *termcmd[]  = { "st", NULL };
+/* static const char *emacs[]  = { "emacsclient", "-c", NULL }; */
+/* static const char *termcmd[]  = { "/bin/sh", "-c", "${TERMINAL}", NULL }; */
 
+#define EMACS  "emacsclient", "-c", "-a", "emacs"
 
 static const char *barmenu[]       =  {"bar",            NULL   };
 
 static const char *shot[]          =  {"windowshot.sh",  "-c",  NULL          };
-static const char *dmenushot[]     =  {"windowshot.sh",  NULL    };             
-static const char *nm[]            =  {"dmenu_connection_manager.sh", NULL };
+static const char *dmenushot[]     =  {"windowshot.sh",  NULL    };
+static const char *nm[]            =  {"menu_connection_manager.sh", NULL };
 
 static const char term[]           =  { "st"};
 static const char exec[]           =  { "-e" };
-/*First arg only serves to match against key in rules*/
-static const char *scratchpadcmd[] =  {"s", term,             "-t",  "scratchpad", NULL}; 
-static const char *scratchpadalt[] =  {"S", term,             "-t",  "scratchpadalt", NULL}; 
-static const char *calc[]          =  {"c", term, "-f", "Liberation Mono:pixelsize=25:antialias=true:autohint=true", "-t", "calculator", "-e", "qalc", NULL}; 
-static const char *mixer[]          =  {"u", term, exec, "cm", NULL}; 
-static const char *email[]         =  { "e", term, "-t", "neomutt", exec, "neomutt", NULL };
+
+static const char *emacs[]           =  { EMACS, NULL};
+
+/* Scratch Pads */
+/* First arg only serves to match against key in rules */
+static const char *scratchpadcmd[] =  {"s", term,             "-t",  "scratchpad", NULL};
+static const char *scratchpadalt[] =  {"a", term,             "-t",  "scratchpadalt", NULL};
+static const char *calc[]          =  {"c", term, "-t", "calculator", "-e", "qalc", NULL};
+static const char *mixer[]          =  {"y", term, "-t", "mixer", exec, "cm", NULL};
+/* static const char *email[]         =  { "emacsclient", "-c", "-e", "'(mu4e)'", NULL }; */
+/* static const char *email[]         =  { "m", term, "-t", "email", exec, "mutt", NULL }; */
+static const char *emacscratch[]   =  { "e", EMACS, "-T",  "emacscratch", NULL};
+
 static const char *rec[]           =  { "dmenurecord", NULL };
 /* static const char *mixer[]         =  { term, exec, "cm", NULL }; */
 static const char *mute[]          =  { "cm", "mute", NULL };
@@ -99,30 +119,36 @@ static const char *vdown[]         =  { "cm", "down", "5", NULL };
 static const char *vup[]           =  { "cm", "up", "5", NULL };
 static const char *ldown[]         =  { "cl", "down", "7", NULL };
 static const char *lup[]           =  { "cl", "up", "7", NULL };
+/* static const char *search[]       =  { "/bin/sh", "-c", "emacsclient -e \"(gv/bm)\"" , NULL }; */
 static const char *search[]        =  { "ducksearch", NULL };
+
 static const char *browser[]       =  { "/bin/sh", "-c", "ducksearch \"google-chrome-stable \"" , NULL };
 static const char *plumb[]         =  { "/bin/sh", "-c", "${PLUMBER} -c", NULL };
 static const char *clip[]          =  { "clipmenu", NULL };
-static const char *killit[]        =  { "dmenu-killall", NULL };
+static const char *killit[]        =  { "menu-killall", NULL };
 static const char *power[]         =  { "power_menu.sh", NULL };
 static const char *tutoral[]       =  { "tutorialvids", NULL };
 static const char *rotate[]        =  { "rotate_screen", NULL };
 static const char *keyboard[]      =  { "svkbd-en", "-g", "1280x250+0+0", NULL };
-static const char *record[]        =  { "dmenurecord", NULL };
+static const char *record[]        =  { "menurecord", NULL };
 static const char *noteclose[]     =  { "dunstctl", "close-all", NULL };
 static const char *noteopen[]      =  { "dunstctl", "history-pop", NULL };
 static const char *wac[]           =  { "wac",  NULL };
 static const char *spell[]         =  { "typo", NULL };
+static const char *discord[]       =  { "discord", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_d,      spawn,          {.v = dmenucmd } },
-	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_u,      togglescratch,  {.v = scratchpadcmd } },
-	{ MODKEY|ShiftMask,             XK_u,      togglescratch,  {.v = scratchpadalt } },
+	{ MODKEY|ShiftMask,             XK_d,      spawn,          {.v = discord } },
+	{ MODKEY,                       XK_Return, spawn,          {.v = emacs } },
+	/* { MODKEY,                       XK_Return, spawn,          {.v = termcmd } }, */
+	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = emacs } },
+	{ MODKEY,                       XK_semicolon, spawn,       {.v = termcmd } },
+	{ MODKEY|ShiftMask,             XK_semicolon, spawn,       {.v = emacs } },
 	{ MODKEY,                       XK_c,      togglescratch,  {.v = calc } },
-	/* { MODKEY,                       XK_u,       togglescratch,  {.v = scratchpadcmd } }, */
-	/* { MODKEY|ShiftMask,             XK_u,       spawn,          {.v = scratchpadcmd } }, */
+	{ MODKEY,                       XK_u,      togglescratch,  {.v = scratchpadcmd } },
+	{ MODKEY|ShiftMask,             XK_u,      spawn,          {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_j,      mv,             {.i = -2} },
@@ -170,7 +196,8 @@ static Key keys[] = {
 
 	{ MODKEY|ShiftMask,             XK_t,      spawn,          {.v = tutoral } },
 	{ MODKEY,                       XK_y,      togglescratch,  {.v = mixer } },
-	{ MODKEY,                       XK_e,      togglescratch,  {.v = email } },
+	/* { MODKEY,                       XK_e,      togglescratch,  {.v = email } }, */
+	{ MODKEY,                       XK_e,      togglescratch,  {.v = emacscratch } },
 	{ MODKEY,                       XK_r,      spawn,          {.v = rec } },
 	{ MODKEY,                       XK_w,      spawn,          {.v = search } },
 	{ MODKEY|ShiftMask,             XK_w,      spawn,          {.v = browser } },
